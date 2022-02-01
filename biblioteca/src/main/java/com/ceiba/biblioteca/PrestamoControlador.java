@@ -3,6 +3,7 @@ package com.ceiba.biblioteca;
 
 import com.ceiba.biblioteca.dto.PrestamoDto;
 import com.ceiba.biblioteca.response.Mensaje;
+import com.ceiba.biblioteca.response.MessagesResponse;
 import com.ceiba.biblioteca.response.MensajeEnum;
 import com.ceiba.biblioteca.response.SuccessResponse;
 import com.ceiba.biblioteca.response.SuccessShortResponse;
@@ -34,13 +35,15 @@ public class PrestamoControlador {
     public static final int USUARIO_EMPLEADO = 2;
     public static final int USUARIO_INVITADO = 3;
     
+    MessagesResponse mensajeResponse;
     Mensaje mensaje;
     UtilFunction utilFunction;
     
     @Autowired
     private PrestamoService prestamoService;
 
-    public PrestamoControlador(Mensaje mensaje, UtilFunction utilFunction) {
+    public PrestamoControlador(MessagesResponse mensajeResponse, Mensaje mensaje, UtilFunction utilFunction) {
+        this.mensajeResponse = mensajeResponse;
         this.mensaje = mensaje;
         this.utilFunction = utilFunction;
     }
@@ -48,22 +51,23 @@ public class PrestamoControlador {
     @PostMapping("")
     public ResponseEntity<?> crearPrestamo(@RequestBody PrestamoDto prestamoDto) {
         try {
+            if(!utilFunction.verificarTipoUsuario(prestamoDto)){
+                mensaje = new Mensaje(
+                        "Tipo de usuario no permitido en la biblioteca"); 
+                return new ResponseEntity<>(mensaje, HttpStatus.BAD_REQUEST);
+            }
             if(prestamoDto.getTipoUsuario() == USUARIO_INVITADO){
-                mensaje = utilFunction.getUserInvited(prestamoDto.getIdentificacionUsuario());
-                if(!mensaje.isError(mensaje)){
-                    if(!mensaje.isInfo(mensaje)){
+                mensajeResponse = utilFunction.getUserInvited(prestamoDto.getIdentificacionUsuario());
+                if(!mensajeResponse.isError(mensajeResponse)){
+                    if(!mensajeResponse.isInfo(mensajeResponse)){
+                        mensaje = new Mensaje(mensajeResponse.getMensaje());
                         return new ResponseEntity<>(mensaje.getMensaje(), 
                                 HttpStatus.BAD_REQUEST);
                     }
                 }else{
-                    return new ResponseEntity<>(mensaje.getMensaje(), 
+                    return new ResponseEntity<>(mensajeResponse.getMensaje(), 
                             HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-            }            
-            if(!utilFunction.verificarTipoUsuario(prestamoDto)){
-                mensaje = new Mensaje(
-                        "Tipo de usuario no permitido en la biblioteca.", MensajeEnum.ERROR); 
-                return new ResponseEntity<>(mensaje, HttpStatus.BAD_REQUEST);
             }
             prestamoDto = utilFunction.calcularFecha(prestamoDto);
             prestamoDto = prestamoService.guardar(prestamoDto);            

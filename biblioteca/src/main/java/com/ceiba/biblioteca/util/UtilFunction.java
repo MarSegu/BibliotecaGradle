@@ -1,7 +1,7 @@
 package com.ceiba.biblioteca.util;
 
 import com.ceiba.biblioteca.dto.PrestamoDto;
-import com.ceiba.biblioteca.response.Mensaje;
+import com.ceiba.biblioteca.response.MessagesResponse;
 import com.ceiba.biblioteca.response.MensajeEnum;
 import com.ceiba.biblioteca.response.SuccessResponse;
 import com.ceiba.biblioteca.response.SuccessShortResponse;
@@ -32,7 +32,7 @@ public class UtilFunction {
      * @param nombre
      * @return
      */
-    public Mensaje getUserInvited(String nombre) {
+    public MessagesResponse getUserInvited(String nombre) {
         List<PrestamoDto> prestamosDto = prestamoService.encontrarUsuariosPorNombre(nombre);
         if (prestamosDto != null) {
             if (!prestamosDto.isEmpty()) {
@@ -42,16 +42,16 @@ public class UtilFunction {
                     prestamoDto.setIdentificacionUsuario(prestamoForDto.getIdentificacionUsuario());
                     prestamoDto.setTipoUsuario(prestamoForDto.getTipoUsuario());
                 }
-                return new Mensaje("El usuario con identificacion "
+                return new MessagesResponse("El usuario con identificación "
                         + prestamoDto.getIdentificacionUsuario() + " ya tiene un libro "
                         + "prestado por lo cual no se le puede realizar otro"
-                        + " prestamo.", MensajeEnum.WARNING);
+                        + " préstamo.", MensajeEnum.WARNING);
             } else {
-                return new Mensaje("El usuario no tiene prestamos activos.",
+                return new MessagesResponse("El usuario no tiene prestamos activos.",
                         MensajeEnum.INFO);
             }
         }
-        return new Mensaje("No fue posible validar si el usuario tiene prestamos "
+        return new MessagesResponse("No fue posible validar si el usuario tiene prestamos "
                 + "activos.", MensajeEnum.ERROR);
     }
 
