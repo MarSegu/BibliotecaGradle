@@ -8,6 +8,7 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Clase de implementacion CRUD
@@ -29,15 +30,22 @@ public class PrestamoServiceImpl implements PrestamoService{
     }    
     
     @Override 
-    public void guardar(PrestamoDto prestamoDto) {
-        prestamo = prestamoConverterImpl.convertPrestamoDtoToPrestamo(prestamoDto);
-        prestamoDao.save(prestamo);
+    public PrestamoDto guardar(PrestamoDto prestamoDto) {        
+        this.prestamo = prestamoDao.save(prestamoConverterImpl.convertPrestamoDtoToPrestamo(prestamoDto));
+        return prestamoConverterImpl.converterPrestamoToPrestamoDto(this.prestamo);
     }
 
     @Override
     public List<PrestamoDto> encontrarUsuariosPorNombre(String nombre) {
-        this.prestamos = prestamoDao.findByIdUsuario(nombre);
+        this.prestamos = prestamoDao.findByIdentificacionUsuario(nombre);
         return prestamoConverterImpl.converterPrestamosToPrestamosDto(this.prestamos);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public PrestamoDto encontrarPrestamoPorId(Long idPrestamo) {        
+        this.prestamo = prestamoDao.findByIdPrestamo(idPrestamo);        
+        return prestamoConverterImpl.converterPrestamoToPrestamoDto(this.prestamo);
     }
 
 }

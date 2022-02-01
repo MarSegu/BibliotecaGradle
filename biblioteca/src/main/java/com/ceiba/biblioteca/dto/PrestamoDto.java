@@ -1,5 +1,8 @@
 package com.ceiba.biblioteca.dto;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Clase Dto utilizada para separar la capa de controlador 
  * de la capa de entidad.
@@ -8,39 +11,49 @@ package com.ceiba.biblioteca.dto;
  */
 public class PrestamoDto {
     
-    private String idPrestamo;
+    private Long idPrestamo;
+    
+    private String isbn;
      
-    private String idUsuario; 
+    private String identificacionUsuario; 
     
     private int tipoUsuario;
+    
+    private Date fechaEntrega;
 
     public PrestamoDto() {
     }
 
-    public PrestamoDto(String idPrestamo) {
+    public PrestamoDto(Long idPrestamo, String isbn, String identificacionUsuario, int tipoUsuario, Date fechaEntrega) {
         this.idPrestamo = idPrestamo;
-    }
-
-    public PrestamoDto(String idPrestamo, String idUsuario, int tipoUsuario) {
-        this.idPrestamo = idPrestamo;
-        this.idUsuario = idUsuario;
+        this.isbn = isbn;
+        this.identificacionUsuario = identificacionUsuario;
         this.tipoUsuario = tipoUsuario;
+        this.fechaEntrega = fechaEntrega;
     }
 
-    public String getIdPrestamo() {
+    public Long getIdPrestamo() {
         return idPrestamo;
     }
 
-    public void setIdPrestamo(String idPrestamo) {
+    public void setIdPrestamo(Long idPrestamo) {
         this.idPrestamo = idPrestamo;
     }
 
-    public String getIdUsuario() {
-        return idUsuario;
+    public String getIsbn() {
+        return isbn;
     }
 
-    public void setIdUsuario(String idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+    
+    public String getIdentificacionUsuario() {
+        return identificacionUsuario;
+    }
+
+    public void setIdentificacionUsuario(String identificacionUsuario) {
+        this.identificacionUsuario = identificacionUsuario;
     }
 
     public int getTipoUsuario() {
@@ -51,9 +64,17 @@ public class PrestamoDto {
         this.tipoUsuario = tipoUsuario;
     }
 
+    public Date getFechaEntrega() {
+        return fechaEntrega;
+    }
+
+    public void setFechaEntrega(Date fechaEntrega) {
+        this.fechaEntrega = fechaEntrega;
+    }
+
     @Override
     public String toString() {
-        return "PrestamoDto{" + "idPrestamo=" + idPrestamo + ", idUsuario=" + idUsuario + ", tipoUsuario=" + tipoUsuario + '}';
-    }    
+        return "PrestamoDto{" + "idPrestamo=" + idPrestamo + ", isbn=" + isbn + ", identificacionUsuario=" + identificacionUsuario + ", tipoUsuario=" + tipoUsuario + ", fechaEntrega=" + fechaEntrega + '}';
+    }
     
 }

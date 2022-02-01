@@ -4,8 +4,11 @@ package com.ceiba.biblioteca;
 import com.ceiba.biblioteca.dto.PrestamoDto;
 import com.ceiba.biblioteca.response.Mensaje;
 import com.ceiba.biblioteca.response.MensajeEnum;
+import com.ceiba.biblioteca.response.SuccessResponse;
+import com.ceiba.biblioteca.response.SuccessShortResponse;
 import com.ceiba.biblioteca.service.PrestamoService;
-import java.util.List;
+import com.ceiba.biblioteca.util.UtilFunction;
+import java.text.ParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,17 +30,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("prestamo")
 public class PrestamoControlador {
 
+    public static final int USUARIO_AFILIADO = 1;
+    public static final int USUARIO_EMPLEADO = 2;
+    public static final int USUARIO_INVITADO = 3;
+    
     Mensaje mensaje;
-    MensajeEnum mensajeEnum;
+    UtilFunction utilFunction;
     
     @Autowired
     private PrestamoService prestamoService;
+
+    public PrestamoControlador(Mensaje mensaje, UtilFunction utilFunction) {
+        this.mensaje = mensaje;
+        this.utilFunction = utilFunction;
+    }
     
-    @PostMapping("/crear")
+    @PostMapping("")
     public ResponseEntity<?> crearPrestamo(@RequestBody PrestamoDto prestamoDto) {
         try {
-            if(prestamoDto.getTipoUsuario() == 3){
-                mensaje = getUserInvited(prestamoDto.getIdUsuario());
+            if(prestamoDto.getTipoUsuario() == USUARIO_INVITADO){
+                mensaje = utilFunction.getUserInvited(prestamoDto.getIdentificacionUsuario());
                 if(!mensaje.isError(mensaje)){
                     if(!mensaje.isInfo(mensaje)){
                         return new ResponseEntity<>(mensaje.getMensaje(), 
@@ -48,53 +60,30 @@ public class PrestamoControlador {
                             HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }            
-            
-            prestamoService.guardar(prestamoDto);
-            String response = "Prestamo Creado exitosamente";
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
+            if(!utilFunction.verificarTipoUsuario(prestamoDto)){
+                mensaje = new Mensaje(
+                        "Tipo de usuario no permitido en la biblioteca.", MensajeEnum.ERROR); 
+                return new ResponseEntity<>(mensaje, HttpStatus.BAD_REQUEST);
+            }
+            prestamoDto = utilFunction.calcularFecha(prestamoDto);
+            prestamoDto = prestamoService.guardar(prestamoDto);            
+            SuccessShortResponse successShortResponse = utilFunction.crearRespuestaCorta(prestamoDto);
+            return new ResponseEntity<>(successShortResponse, HttpStatus.OK);
+        } catch (ParseException e) {
             log.error("Error: " + e);
             String errorResponse = "No fue posible crear el usuario."; 
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
-    @GetMapping("/encontrar/{nombre}")
-    public ResponseEntity<?> getUserByName(@PathVariable("nombre") String nombre) {
-        List<PrestamoDto> prestamosDto = prestamoService.encontrarUsuariosPorNombre(nombre);
-        if (prestamosDto != null) {
-            if (!prestamosDto.isEmpty()) {
-                return new ResponseEntity<>(prestamosDto, HttpStatus.OK);
-            } else {
-                String errorResponse = "El usuario no fue encontrado."; 
-                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-            }
+    @GetMapping("/{idPrestamo}")
+    public ResponseEntity<?> getUserById(@PathVariable("idPrestamo") Long idPrestamo) throws ParseException{
+        PrestamoDto prestamoDto = prestamoService.encontrarPrestamoPorId(idPrestamo);
+        if(prestamoDto != null){
+            SuccessResponse successResponse = utilFunction.crearRespuesta(prestamoDto);
+            return new ResponseEntity<>(successResponse, HttpStatus.OK);
         }
-        String errorResponse = "No fue posible realizar la consulta."; 
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    
-    public Mensaje getUserInvited(String nombre) {
-        List<PrestamoDto> prestamosDto = prestamoService.encontrarUsuariosPorNombre(nombre);
-        if (prestamosDto != null) {
-            if (!prestamosDto.isEmpty()) {
-                PrestamoDto prestamoDto = new PrestamoDto();
-                for(PrestamoDto prestamoForDto: prestamosDto){
-                    prestamoDto.setIdPrestamo(prestamoForDto.getIdPrestamo());
-                    prestamoDto.setIdUsuario(prestamoForDto.getIdUsuario());
-                    prestamoDto.setTipoUsuario(prestamoForDto.getTipoUsuario());
-                }
-                return new Mensaje("El usuario con identificacion " 
-                                + prestamoDto.getIdUsuario() + " ya tiene un libro "
-                                + "prestado por lo cual no se le puede realizar otro"
-                                        + "prestamo", mensajeEnum.WARNING);
-            } else {
-                return new Mensaje("El usuario no tiene prestamos activos.", 
-                        mensajeEnum.INFO);
-            }
-        }
-        return new Mensaje("No fue posible validar si el usuario tiene prestamos "
-                + "activos.", mensajeEnum.ERROR);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
 

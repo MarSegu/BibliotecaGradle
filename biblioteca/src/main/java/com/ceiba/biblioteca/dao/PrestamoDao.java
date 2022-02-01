@@ -8,5 +8,12 @@ import java.util.List;
  * @author Mario Segura
  */
 public interface PrestamoDao extends JpaRepository<Prestamo, Long>{
-    List<Prestamo> findByIdUsuario(String nombre);
+    @Override
+    Prestamo save(Prestamo prestamo);
+    
+    List<Prestamo> findByIsbn(String isbn);
+    
+    Prestamo findByIdPrestamo(Long idPrestamo);
+    
+    List<Prestamo> findByIdentificacionUsuario(String identificacionUsuario);
 }

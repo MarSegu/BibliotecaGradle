@@ -1,9 +1,12 @@
 package com.ceiba.biblioteca.response;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Objeto de respuesta de peticiones
  * @author Mario Segura
  */
+@Component
 public class Mensaje {
     String mensaje;
     MensajeEnum tipoMensaje;

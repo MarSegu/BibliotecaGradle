@@ -196,7 +196,8 @@ class PrestamoTests {
                 .content(objectMapper.writeValueAsString(new SolicitudPrestarLibroTest("EQWQW8545", "1111111111", USUARIO_DESCONOCIDO))))
                 .andDo(print())
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.mensaje", is("Tipo de usuario no permitido en la biblioteca")));
+                .andExpect(jsonPath("$.mensaje", is("Tipo de usuario no permitido en la biblioteca")))
+                .andExpect(jsonPath("$.tipoMensaje").exists());
     }
 
 

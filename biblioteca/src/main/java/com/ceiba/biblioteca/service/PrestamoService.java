@@ -8,6 +8,7 @@ import java.util.List;
  * @author Mario Segura
  */
 public interface PrestamoService {
-    public void guardar(PrestamoDto prestamoDto);
+    public PrestamoDto guardar(PrestamoDto prestamoDto);
     public List<PrestamoDto> encontrarUsuariosPorNombre(String nombre);
+    public PrestamoDto encontrarPrestamoPorId(Long idPrestamo);
 }

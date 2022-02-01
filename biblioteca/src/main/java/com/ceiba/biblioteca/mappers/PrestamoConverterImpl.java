@@ -28,8 +28,10 @@ public class PrestamoConverterImpl implements PrestamoConverter {
     public Prestamo convertPrestamoDtoToPrestamo(PrestamoDto prestamoDto) {
         if (prestamoDto != null) {
             this.prestamo.setIdPrestamo(prestamoDto.getIdPrestamo());
-            this.prestamo.setIdUsuario(prestamoDto.getIdUsuario());
+            this.prestamo.setIsbn(prestamoDto.getIsbn());
+            this.prestamo.setIdentificacionUsuario(prestamoDto.getIdentificacionUsuario());
             this.prestamo.setTipoUsuario(prestamoDto.getTipoUsuario());
+            this.prestamo.setFechaEntrega(prestamoDto.getFechaEntrega());
             return this.prestamo;
         } else {
             return null;
@@ -40,8 +42,10 @@ public class PrestamoConverterImpl implements PrestamoConverter {
     public PrestamoDto converterPrestamoToPrestamoDto(Prestamo prestamo) {
         if (prestamo != null) {
             this.prestamoDto.setIdPrestamo(prestamo.getIdPrestamo());
-            this.prestamoDto.setIdUsuario(prestamo.getIdUsuario());
+            this.prestamoDto.setIsbn(prestamo.getIsbn());
+            this.prestamoDto.setIdentificacionUsuario(prestamo.getIdentificacionUsuario());
             this.prestamoDto.setTipoUsuario(prestamo.getTipoUsuario());
+            this.prestamoDto.setFechaEntrega(prestamo.getFechaEntrega());
             return this.prestamoDto;
         } else {
             return null;
@@ -50,11 +54,14 @@ public class PrestamoConverterImpl implements PrestamoConverter {
 
     @Override
     public List<PrestamoDto> converterPrestamosToPrestamosDto(List<Prestamo> prestamos) {
+        this.prestamosDto = new ArrayList<>();
         if (prestamos != null) {
             for(Prestamo prestamo : prestamos){
                 this.prestamoDto.setIdPrestamo(prestamo.getIdPrestamo());
-                this.prestamoDto.setIdUsuario(prestamo.getIdUsuario());
+                this.prestamoDto.setIsbn(prestamo.getIsbn());
+                this.prestamoDto.setIdentificacionUsuario(prestamo.getIdentificacionUsuario());
                 this.prestamoDto.setTipoUsuario(prestamo.getTipoUsuario());
+                this.prestamoDto.setFechaEntrega(prestamo.getFechaEntrega());
                 this.prestamosDto.add(this.prestamoDto);
             }
             return this.prestamosDto;

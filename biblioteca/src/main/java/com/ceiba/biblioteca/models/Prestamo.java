@@ -1,6 +1,7 @@
 package com.ceiba.biblioteca.models;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,17 +22,23 @@ import lombok.Data;
 @Table(name = "prestamo")
 public class Prestamo implements Serializable{
     
-     private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     @Id
-    @Column(name="isbn", length = 10)
-    private String idPrestamo;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idPrestamo;
     
-    @Column(name = "identificacionUsuario", length = 10)
+    @Column(name="isbn", length = 10)
+    private String isbn;
+    
+    @Column(length = 10)
     @NotEmpty  
-    private String idUsuario; 
+    private String identificacionUsuario; 
     
     @Column(length = 1)
     @NotNull
     private int tipoUsuario;
+    
+    @NotNull
+    private Date fechaEntrega;
     
 }
