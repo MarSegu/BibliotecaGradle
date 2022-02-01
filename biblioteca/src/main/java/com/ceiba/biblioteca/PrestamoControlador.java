@@ -60,7 +60,7 @@ public class PrestamoControlador {
                 if(!mensajeResponse.isError(mensajeResponse)){
                     if(!mensajeResponse.isInfo(mensajeResponse)){
                         mensaje = new Mensaje(mensajeResponse.getMensaje());
-                        return new ResponseEntity<>(mensaje.getMensaje(), 
+                        return new ResponseEntity<>(mensaje, 
                                 HttpStatus.BAD_REQUEST);
                     }
                 }else{
