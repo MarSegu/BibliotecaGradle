@@ -8,7 +8,9 @@ import com.ceiba.biblioteca.response.SuccessShortResponse;
 import com.ceiba.biblioteca.service.PrestamoService;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +44,10 @@ public class UtilFunction {
                     prestamoDto.setIdentificacionUsuario(prestamoForDto.getIdentificacionUsuario());
                     prestamoDto.setTipoUsuario(prestamoForDto.getTipoUsuario());
                 }
-                return new MessagesResponse("El usuario con identificación "
+                return new MessagesResponse("El usuario con identificaciÃ³n "
                         + prestamoDto.getIdentificacionUsuario() + " ya tiene un libro "
                         + "prestado por lo cual no se le puede realizar otro"
-                        + " préstamo.", MensajeEnum.WARNING);
+                        + " prÃ©stamo", MensajeEnum.WARNING);
             } else {
                 return new MessagesResponse("El usuario no tiene prestamos activos.",
                         MensajeEnum.INFO);
@@ -62,8 +64,12 @@ public class UtilFunction {
      */
     public PrestamoDto calcularFecha(PrestamoDto prestamoDto) {
 
-        int diasPrestamo;
-
+        LocalDate fechaPrestamo = LocalDate.now();
+        LocalDate result = fechaPrestamo;
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        int addedDays = 0;
+        int diasPrestamo = 0;
+        
         switch (prestamoDto.getTipoUsuario()) {
             case 1:
                 diasPrestamo = 10;
@@ -75,21 +81,14 @@ public class UtilFunction {
                 diasPrestamo = 7;
                 break;
         }
-
-        Date dateEntrega = new Date();
-        Calendar fechaEntrega = Calendar.getInstance();
-        fechaEntrega.setTime(dateEntrega);
         
-        while (diasPrestamo > 0) {
-            if (fechaEntrega.get(Calendar.DAY_OF_WEEK) != 1 && fechaEntrega.get(Calendar.DAY_OF_WEEK) != 7) {
-                fechaEntrega.add(Calendar.DATE, 1);
-                diasPrestamo = diasPrestamo - 1;
-            } else {
-                fechaEntrega.add(Calendar.DATE, 1);
+        while (addedDays < diasPrestamo) {
+            result = result.plusDays(1);
+            if (!(result.getDayOfWeek() == DayOfWeek.SATURDAY || result.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+                ++addedDays;
             }
         }
-        dateEntrega = fechaEntrega.getTime();
-        prestamoDto.setFechaEntrega(dateEntrega);
+        prestamoDto.setFechaEntrega(Date.from(result.atStartOfDay(defaultZoneId).toInstant()));
         return prestamoDto;
 
     }
